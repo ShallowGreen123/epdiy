@@ -354,13 +354,16 @@ void epd_renderer_deinit() {
 }
 
 #ifdef RENDER_METHOD_LCD
+// TODO
 uint32_t epd_interlace_4bpp_line_VE(
     const uint8_t* to,
     const uint8_t* from,
     uint8_t* interlaced,
     uint8_t* col_dirtyness,
     int fb_width
-);
+){
+    return 0;
+}
 #endif
 
 /**

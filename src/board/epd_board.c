@@ -16,8 +16,8 @@ static epd_ctrl_state_t ctrl_state;
 const EpdBoardDefinition* epd_board = NULL;
 
 void IRAM_ATTR epd_busy_delay(uint32_t cycles) {
-    volatile unsigned long counts = XTHAL_GET_CCOUNT() + cycles;
-    while (XTHAL_GET_CCOUNT() < counts) {
+    volatile unsigned long counts = esp_cpu_get_cycle_count() + cycles;
+    while (esp_cpu_get_cycle_count() < counts) {
     };
 }
 

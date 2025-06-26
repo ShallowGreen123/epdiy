@@ -18,6 +18,8 @@ extern const enum EpdRenderMethod EPD_CURRENT_RENDER_METHOD;
 #define RENDER_METHOD_I2S 1
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
 #define RENDER_METHOD_LCD 1
+#elif defined(CONFIG_IDF_TARGET_ESP32P4)
+#define RENDER_METHOD_LCD 1
 #else
 #error "unknown chip, cannot choose render method!"
 #endif

@@ -167,9 +167,12 @@ __attribute__((optimize("O3"))) static inline uint8_t lookup_pixels_in_VE_LUT(
  * Lookup accelerated by the S3 Vector Extensions.
  * Expects aligned buffers and a length that is divisible by 16.
  */
+// TODO
 void IRAM_ATTR calc_epd_input_1ppB_1k_S3_VE_aligned(
     const uint32_t* ld, uint8_t* epd_input, const uint8_t* conversion_lut, uint32_t epd_width
-);
+){
+    
+}
 
 #ifdef RENDER_METHOD_I2S
 void calc_epd_input_1ppB_1k_S3_VE_aligned(

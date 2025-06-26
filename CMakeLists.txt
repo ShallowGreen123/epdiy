@@ -7,13 +7,13 @@ set(app_sources "src/epdiy.c"
                 "src/output_i2s/rmt_pulse.c"
                 "src/output_i2s/i2s_data_bus.c"
                 "src/output_common/lut.c"
-                "src/output_common/lut.S"
+                # "src/output_common/lut.S"
                 "src/output_common/line_queue.c"
                 "src/output_common/render_context.c"
                 "src/output_common/render_method.c"
                 "src/font.c"
                 "src/displays.c"
-                "src/diff.S"
+                # "src/diff.S"
                 "src/board_specific.c"
                 "src/builtin_waveforms.c"
                 "src/highlevel.c"
@@ -41,4 +41,4 @@ endif()
 
 # formatting specifiers maybe incompatible between idf versions because of different int definitions
 component_compile_options(-Wno-error=format= -Wno-format)
-set_source_files_properties("src/output_common/lut.c" PROPERTIES COMPILE_OPTIONS -mno-fix-esp32-psram-cache-issue)
+# set_source_files_properties("src/output_common/lut.c" PROPERTIES COMPILE_OPTIONS -mno-fix-esp32-psram-cache-issue)

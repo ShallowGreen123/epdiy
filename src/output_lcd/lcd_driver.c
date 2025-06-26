@@ -174,6 +174,8 @@ static void ckv_rmt_build_signal() {
  * Configure the RMT peripheral for use as the CKV clock.
  */
 static void init_ckv_rmt() {
+    int __DECLARE_RCC_ATOMIC_ENV __attribute__ ((unused)); // To avoid build errors/warnings about __DECLARE_RCC_ATOMIC_ENV
+
     periph_module_reset(PERIPH_RMT_MODULE);
     periph_module_enable(PERIPH_RMT_MODULE);
 
@@ -373,6 +375,35 @@ static void deinit_bus_gpio() {
  * Check if the PSRAM cache is properly configured.
  */
 static void check_cache_configuration() {
+
+#if CONFIG_IDF_TARGET_ESP32P4
+    if (CONFIG_CACHE_L2_CACHE_LINE_SIZE < 64) {
+        ESP_LOGE(
+            "epdiy",
+            "cache line size is set to %d (< 64B)! This will degrade performance, please update "
+            "this option in menuconfig.",
+            CONFIG_CACHE_L2_CACHE_LINE_SIZE
+        );
+        ESP_LOGE(
+            "epdiy",
+            "If you are on arduino, you can't set this option yourself, you'll need to use a lower "
+            "speed."
+        );
+        ESP_LOGE(
+            "epdiy",
+            "Reducing the pixel clock from %d MHz to %d MHz for now!",
+            lcd.config.pixel_clock / 1000 / 1000,
+            lcd.config.pixel_clock / 1000 / 1000 / 2
+        );
+        lcd.config.pixel_clock = lcd.config.pixel_clock / 2;
+
+        // fixme: this would be nice, but doesn't work :(
+        // uint32_t d_autoload = Cache_Suspend_DCache();
+        /// Cache_Set_DCache_Mode(CACHE_SIZE_FULL, CACHE_4WAYS_ASSOC, CACHE_LINE_SIZE_32B);
+        // Cache_Invalidate_DCache_All();
+        // Cache_Resume_DCache(d_autoload);
+    }
+#else 
     if (CONFIG_ESP32S3_DATA_CACHE_LINE_SIZE < 64) {
         ESP_LOGE(
             "epdiy",
@@ -399,6 +430,7 @@ static void check_cache_configuration() {
         // Cache_Invalidate_DCache_All();
         // Cache_Resume_DCache(d_autoload);
     }
+#endif
 }
 
 /**
@@ -471,6 +503,7 @@ static void free_lcd_buffers() {
  */
 static esp_err_t init_lcd_peripheral() {
     esp_err_t ret = ESP_OK;
+    int __DECLARE_RCC_ATOMIC_ENV __attribute__ ((unused)); // To avoid build errors/warnings about __DECLARE_RCC_ATOMIC_ENV
 
     // enable APB to access LCD registers
     periph_module_enable(PERIPH_LCD_CAM_MODULE);
@@ -478,11 +511,11 @@ static esp_err_t init_lcd_peripheral() {
 
     lcd_hal_init(&lcd.hal, 0);
     lcd_ll_enable_clock(lcd.hal.dev, true);
-    lcd_ll_select_clk_src(lcd.hal.dev, LCD_CLK_SRC_PLL240M);
+    lcd_ll_select_clk_src(lcd.hal.dev, LCD_CLK_SRC_PLL160M);
     ESP_RETURN_ON_ERROR(ret, TAG, "set source clock failed");
 
     // install interrupt service, (LCD peripheral shares the interrupt source with Camera by
-    // different mask)
+    // different mask) 
     int flags = ESP_INTR_FLAG_IRAM | ESP_INTR_FLAG_INTRDISABLED | ESP_INTR_FLAG_SHARED
                 | ESP_INTR_FLAG_LOWMED;
 
@@ -604,7 +637,7 @@ void epd_lcd_deinit() {
 
 void epd_lcd_set_pixel_clock_MHz(int frequency) {
     lcd.config.pixel_clock = frequency * 1000 * 1000;
-
+    int __DECLARE_RCC_ATOMIC_ENV __attribute__ ((unused)); // To avoid build errors/warnings about __DECLARE_RCC_ATOMIC_ENV
     // set pclk
     int flags = 0;
 

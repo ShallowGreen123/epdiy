@@ -18,7 +18,11 @@
 #include "render_lcd.h"
 
 // declare vector optimized line mask application.
-void epd_apply_line_mask_VE(uint8_t* line, const uint8_t* mask, int mask_len);
+// TODO
+void epd_apply_line_mask_VE(uint8_t* line, const uint8_t* mask, int mask_len)
+{
+
+}
 
 __attribute__((optimize("O3"))) static bool IRAM_ATTR
 retrieve_line_isr(RenderContext_t* ctx, uint8_t* buf) {
@@ -218,7 +222,12 @@ lcd_calculate_frame(RenderContext_t* ctx, int thread_id) {
         uint32_t* lp = (uint32_t*)input_line;
         const uint8_t* ptr = ptr_start + bytes_per_line * (l - min_y);
 
+#if CONFIG_IDF_TARGET_ESP32P4
+        Cache_Start_L2_Cache_Preload((uint32_t)ptr, ctx->display_width, 0);
+#else
         Cache_Start_DCache_Preload((uint32_t)ptr, ctx->display_width, 0);
+#error "Unsupported target"
+#endif
 
         lp = (uint32_t*)ptr;
 
